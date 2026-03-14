@@ -1,7 +1,10 @@
 import os
-import numpy as np
-from keras.models import load_model
-from keras.preprocessing.image import load_img, img_to_array
+try:
+    import numpy as np
+    from keras.models import load_model
+    from keras.preprocessing.image import load_img, img_to_array
+except ImportError:
+    pass
 
 # Get absolute path to the model
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

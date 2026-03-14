@@ -1,0 +1,169 @@
+{% extends 'myapp/base.html' %}
+{% block title %}Soil Health Calculator - AgroBrain{% endblock %}
+{% block content %}
+<div class="bg-gradient-to-b from-emerald-50 to-white min-h-screen py-10 px-4">
+    <div class="max-w-4xl mx-auto">
+
+        <div class="text-center mb-10">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-amber-100 rounded-full mb-4">
+                <svg class="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                </svg>
+            </div>
+            <h1 class="text-4xl font-extrabold text-emerald-800 mb-2">Soil Health Calculator</h1>
+            <p class="text-gray-500 max-w-xl mx-auto">Enter your soil test values to get personalized fertilizer
+                recommendations and soil health insights.</p>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-lg border border-emerald-100 p-8 mb-8">
+            <form method="POST" class="space-y-6" id="soilForm">
+                {% csrf_token %}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-semibold text-emerald-700 mb-2">🟡 Nitrogen (N) - kg/ha</label>
+                        <input type="number" name="nitrogen" step="0.1" min="0" placeholder="e.g. 250"
+                            class="w-full border border-emerald-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-emerald-400 focus:outline-none">
+                        <p class="text-xs text-gray-400 mt-1">Optimal: 200-400 kg/ha</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-emerald-700 mb-2">🟠 Phosphorus (P) -
+                            kg/ha</label>
+                        <input type="number" name="phosphorus" step="0.1" min="0" placeholder="e.g. 25"
+                            class="w-full border border-emerald-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-emerald-400 focus:outline-none">
+                        <p class="text-xs text-gray-400 mt-1">Optimal: 10-50 kg/ha</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-emerald-700 mb-2">🟣 Potassium (K) -
+                            kg/ha</label>
+                        <input type="number" name="potassium" step="0.1" min="0" placeholder="e.g. 200"
+                            class="w-full border border-emerald-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-emerald-400 focus:outline-none">
+                        <p class="text-xs text-gray-400 mt-1">Optimal: 100-500 kg/ha</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-emerald-700 mb-2">⚗️ Soil pH Level</label>
+                        <input type="number" name="ph" step="0.1" min="0" max="14" placeholder="e.g. 6.5"
+                            class="w-full border border-emerald-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-emerald-400 focus:outline-none">
+                        <p class="text-xs text-gray-400 mt-1">Ideal: 6.0-7.5 for most crops</p>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-emerald-700 mb-2">🌾 Intended Crop (Optional)</label>
+                    <select name="crop"
+                        class="w-full border border-emerald-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-emerald-400 focus:outline-none text-gray-700">
+                        <option value="">Select a crop...</option>
+                        {% for crop in crops %}
+                        <option value="{{ crop }}">{{ crop }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <button type="submit" id="soilBtn"
+                    class="w-full bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold py-4 rounded-xl hover:from-amber-600 hover:to-orange-600 transition-all shadow-md flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                    Analyze Soil & Get Recommendations
+                </button>
+            </form>
+        </div>
+
+        {% if result %}
+        <div class="bg-white rounded-2xl shadow-lg border border-emerald-100 p-8">
+            <h2 class="text-2xl font-bold text-emerald-800 mb-6 flex items-center gap-2">
+                <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Soil Analysis Results
+            </h2>
+            <div class="space-y-4">
+                {% for rec in result %}
+                <div
+                    class="p-4 rounded-xl border {% if '🟢' in rec %}bg-green-50 border-green-200{% elif '🟡' in rec %}bg-yellow-50 border-yellow-200{% elif '🔴' in rec %}bg-red-50 border-red-200{% else %}bg-emerald-50 border-emerald-200{% endif %}">
+                    <p class="text-gray-800 font-medium">{{ rec }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Reference Chart -->
+        <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-white rounded-xl p-5 border border-emerald-100 shadow-sm">
+                <h3 class="font-bold text-emerald-700 mb-3">NPK Reference</h3>
+                <table class="text-sm w-full">
+                    <tr class="border-b">
+                        <td class="py-1 text-gray-600">N Low:</td>
+                        <td class="font-medium">&lt; 200 kg/ha</td>
+                    </tr>
+                    <tr class="border-b">
+                        <td class="py-1 text-gray-600">N Optimal:</td>
+                        <td class="font-medium">200-400 kg/ha</td>
+                    </tr>
+                    <tr class="border-b">
+                        <td class="py-1 text-gray-600">P Optimal:</td>
+                        <td class="font-medium">10-50 kg/ha</td>
+                    </tr>
+                    <tr>
+                        <td class="py-1 text-gray-600">K Optimal:</td>
+                        <td class="font-medium">100-500 kg/ha</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="bg-white rounded-xl p-5 border border-emerald-100 shadow-sm">
+                <h3 class="font-bold text-emerald-700 mb-3">pH Guide</h3>
+                <table class="text-sm w-full">
+                    <tr class="border-b">
+                        <td class="py-1 text-gray-600">&lt; 5.5</td>
+                        <td class="text-red-600 font-medium">Very Acidic</td>
+                    </tr>
+                    <tr class="border-b">
+                        <td class="py-1 text-gray-600">5.5-6.0</td>
+                        <td class="text-yellow-600 font-medium">Slightly Acidic</td>
+                    </tr>
+                    <tr class="border-b">
+                        <td class="py-1 text-gray-600">6.0-7.5</td>
+                        <td class="text-green-600 font-medium">Ideal Range</td>
+                    </tr>
+                    <tr>
+                        <td class="py-1 text-gray-600">&gt; 8.0</td>
+                        <td class="text-red-600 font-medium">Alkaline</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="bg-white rounded-xl p-5 border border-emerald-100 shadow-sm">
+                <h3 class="font-bold text-emerald-700 mb-3">Common Fertilizers</h3>
+                <table class="text-sm w-full">
+                    <tr class="border-b">
+                        <td class="py-1 text-gray-600">Urea</td>
+                        <td class="font-medium">46% N</td>
+                    </tr>
+                    <tr class="border-b">
+                        <td class="py-1 text-gray-600">DAP</td>
+                        <td class="font-medium">18% N, 46% P</td>
+                    </tr>
+                    <tr class="border-b">
+                        <td class="py-1 text-gray-600">MOP</td>
+                        <td class="font-medium">60% K2O</td>
+                    </tr>
+                    <tr>
+                        <td class="py-1 text-gray-600">NPK 17-17-17</td>
+                        <td class="font-medium">Balanced</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('soilForm').addEventListener('submit', function () {
+        const btn = document.getElementById('soilBtn');
+        btn.innerHTML = '⏳ Analyzing...';
+        btn.disabled = true;
+    });
+</script>
+{% endblock %}

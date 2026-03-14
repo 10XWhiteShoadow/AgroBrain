@@ -27,7 +27,6 @@ INSTALLED_APPS = [
     'myapp',
     'corsheaders',
     'rest_framework',
-    'django.contrib.postgres',
     'market',
 ]
 

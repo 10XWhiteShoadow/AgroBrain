@@ -15,7 +15,6 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     
     # Application routes
-    
     path('services/', views.services, name='services'),
     path('tools/', views.Tool, name='tools'),
     path('about/', views.about, name='about'),
@@ -25,6 +24,8 @@ urlpatterns = [
     path('TandC/', views.TandC, name='TandC'),
     path('FAQs/', views.FAQs, name='FAQs'),
     path('weather/', views.weather_dashboard, name='weather'),
+    path('contact/', views.contact, name='contact'),
+    path('profile/', views.profile, name='profile'),
     
     # Polygon-related routes
     path('add_polygon/', views.add_polygon, name='add_polygon'),
@@ -40,4 +41,10 @@ urlpatterns = [
     path('plant-health/download/', views.download_report, name='download_pdf'),
     path("plant-health/results/delete/", views.delete_report, name="delete_report"),
     path("plant-health/results/delete/<str:timestamp>/", views.delete_report, name="delete_report_with_timestamp"),
+    
+    # AI & Smart Farming Tools
+    path('ai-chat/', views.ai_chat, name='ai_chat'),
+    path('crop-recommendation/', views.crop_recommendation, name='crop_recommendation'),
+    path('soil-calculator/', views.soil_calculator, name='soil_calculator'),
+    path('irrigation-planner/', views.irrigation_planner, name='irrigation_planner'),
 ]

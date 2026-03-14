@@ -15,7 +15,7 @@ from django.utils import timezone
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse, HttpResponse, Http404
 from django.views import View
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
@@ -97,8 +97,65 @@ def services(request):
     return render(request, 'myapp/services.html')
 @login_required
 def Tool(request):
-    products = tools.objects.all()
-    return render(request, 'myapp/tools.html', {'products': products})
+    """Agricultural tools page with Amazon product links."""
+    tool_categories = [
+        {
+            "name": "Hand Tools & Implements",
+            "icon": "🔧",
+            "items": [
+                {"title": "Gardening Hand Trowel Set (3-piece)", "img": "https://placehold.co/500x500/10b981/ffffff?text=Gardening%20Hand%20Trowel%20Set", "price": "₹349", "link": "https://www.amazon.in/s?k=gardening+hand+trowel+set", "brand": "Ugaoo"},
+                {"title": "Garden Cultivator Hand Fork", "img": "https://placehold.co/500x500/10b981/ffffff?text=Garden%20Cultivator%20Hand%20Fork", "price": "₹249", "link": "https://www.amazon.in/s?k=garden+hand+cultivator+fork", "brand": "Amazon"},
+                {"title": "Khurpi Weeding Tool Steel", "img": "https://placehold.co/500x500/10b981/ffffff?text=Khurpi%20Weeding%20Tool%20Steel", "price": "₹199", "link": "https://www.amazon.in/s?k=khurpi+weeding+tool", "brand": "Ketsy"},
+                {"title": "Garden Spade Shovel with D-Handle", "img": "https://placehold.co/500x500/10b981/ffffff?text=Garden%20Spade%20Shovel%20with", "price": "₹799", "link": "https://www.amazon.in/s?k=garden+spade+shovel", "brand": "Skyla"},
+                {"title": "Garden Hoe for Weeding", "img": "https://placehold.co/500x500/10b981/ffffff?text=Garden%20Hoe%20for%20Weeding", "price": "₹549", "link": "https://www.amazon.in/s?k=garden+hoe+weeding", "brand": "Ketsy"},
+            ]
+        },
+        {
+            "name": "Irrigation & Watering",
+            "icon": "💧",
+            "items": [
+                {"title": "Drip Irrigation Kit (20 Plants)", "img": "https://placehold.co/500x500/10b981/ffffff?text=Drip%20Irrigation%20Kit%20%2820", "price": "₹699", "link": "https://www.amazon.in/s?k=drip+irrigation+kit", "brand": "Zeal"},
+                {"title": "Garden Water Sprinkler 360° Rotating", "img": "https://placehold.co/500x500/10b981/ffffff?text=Garden%20Water%20Sprinkler%20360%C2%B0", "price": "₹399", "link": "https://www.amazon.in/s?k=garden+water+sprinkler+rotating", "brand": "Kraft Seeds"},
+                {"title": "Drip Tape Roll 50m with Emitters", "img": "https://placehold.co/500x500/10b981/ffffff?text=Drip%20Tape%20Roll%2050m", "price": "₹549", "link": "https://www.amazon.in/s?k=drip+tape+irrigation", "brand": "Suraj"},
+                {"title": "Garden Hose Pipe 30m Heavy Duty", "img": "https://placehold.co/500x500/10b981/ffffff?text=Garden%20Hose%20Pipe%2030m", "price": "₹1,299", "link": "https://www.amazon.in/s?k=garden+hose+pipe+30m", "brand": "Visko"},
+                {"title": "Manual Knapsack Sprayer 16L", "img": "https://placehold.co/500x500/10b981/ffffff?text=Manual%20Knapsack%20Sprayer%2016L", "price": "₹1,499", "link": "https://www.amazon.in/s?k=knapsack+sprayer+16+litre", "brand": "Neptune"},
+            ]
+        },
+        {
+            "name": "Soil Testing & Meters",
+            "icon": "🧪",
+            "items": [
+                {"title": "3-in-1 Soil pH/Moisture/Light Meter", "img": "https://placehold.co/500x500/10b981/ffffff?text=3-in-1%20Soil%20pH/Moisture/Light%20Meter", "price": "₹599", "link": "https://www.amazon.in/s?k=soil+ph+moisture+light+meter", "brand": "Dr.meter"},
+                {"title": "Digital Soil Moisture Meter Professional", "img": "https://placehold.co/500x500/10b981/ffffff?text=Digital%20Soil%20Moisture%20Meter", "price": "₹799", "link": "https://www.amazon.in/s?k=digital+soil+moisture+meter", "brand": "Phtronics"},
+                {"title": "NPK Soil Test Kit (50 Tests)", "img": "https://placehold.co/500x500/10b981/ffffff?text=NPK%20Soil%20Test%20Kit", "price": "₹999", "link": "https://www.amazon.in/s?k=npk+soil+test+kit", "brand": "Agri"},
+                {"title": "Digital pH Meter Waterproof", "img": "https://placehold.co/500x500/10b981/ffffff?text=Digital%20pH%20Meter%20Waterproof", "price": "₹1,299", "link": "https://www.amazon.in/s?k=digital+ph+meter+soil+water", "brand": "HM Digital"},
+                {"title": "Soil Test Kit Basic (Organic India)", "img": "https://placehold.co/500x500/10b981/ffffff?text=Soil%20Test%20Kit%20Basic", "price": "₹449", "link": "https://www.amazon.in/s?k=soil+test+kit+india", "brand": "Organic India"},
+            ]
+        },
+        {
+            "name": "Power Tools & Equipment",
+            "icon": "⚡",
+            "items": [
+                {"title": "Electric Cultivator Tiller 900W", "img": "https://placehold.co/500x500/10b981/ffffff?text=Electric%20Cultivator%20Tiller%20900W", "price": "₹4,999", "link": "https://www.amazon.in/s?k=electric+cultivator+tiller", "brand": "Kisankraft"},
+                {"title": "Portable Electric Sprayer 16L", "img": "https://placehold.co/500x500/10b981/ffffff?text=Portable%20Electric%20Sprayer%2016L", "price": "₹3,499", "link": "https://www.amazon.in/s?k=electric+sprayer+16+litre+farm", "brand": "Neptune"},
+                {"title": "Battery Grass Trimmer 20V", "img": "https://placehold.co/500x500/10b981/ffffff?text=Battery%20Grass%20Trimmer%2020V", "price": "₹2,499", "link": "https://www.amazon.in/s?k=cordless+grass+trimmer+20v", "brand": "BLACK+DECKER"},
+                {"title": "Chainsaw Electric 2000W", "img": "https://placehold.co/500x500/10b981/ffffff?text=Chainsaw%20Electric%202000W", "price": "₹3,999", "link": "https://www.amazon.in/s?k=electric+chainsaw+2000w", "brand": "Bosch"},
+                {"title": "Electric Seed Drill Planter", "img": "https://placehold.co/500x500/10b981/ffffff?text=Electric%20Seed%20Drill%20Planter", "price": "₹1,899", "link": "https://www.amazon.in/s?k=seed+drill+planter+electric", "brand": "Agri"},
+            ]
+        },
+        {
+            "name": "Plant Protection",
+            "icon": "🛡️",
+            "items": [
+                {"title": "Insect Pest Catching Sticky Traps (20 pcs)", "img": "https://placehold.co/500x500/10b981/ffffff?text=Insect%20Pest%20Catching%20Sticky", "price": "₹199", "link": "https://www.amazon.in/s?k=sticky+insect+trap+yellow+farm", "brand": "Kraft Seeds"},
+                {"title": "Bird Repeller Net 4m x 5m", "img": "https://placehold.co/500x500/10b981/ffffff?text=Bird%20Repeller%20Net%204m", "price": "₹349", "link": "https://www.amazon.in/s?k=bird+net+farm+garden", "brand": "Agri"},
+                {"title": "Garden Cover Mesh Shade Net 50%", "img": "https://placehold.co/500x500/10b981/ffffff?text=Garden%20Cover%20Mesh%20Shade", "price": "₹499", "link": "https://www.amazon.in/s?k=shade+net+50+percent", "brand": "Singhal"},
+                {"title": "Bio Pesticide Neem Oil 100ml", "img": "https://placehold.co/500x500/10b981/ffffff?text=Bio%20Pesticide%20Neem%20Oil", "price": "₹249", "link": "https://www.amazon.in/s?k=neem+oil+farm+bio+pesticide", "brand": "Organic India"},
+                {"title": "Electric Rat Trap", "img": "https://placehold.co/500x500/10b981/ffffff?text=Electric%20Rat%20Trap", "price": "₹1,299", "link": "https://www.amazon.in/s?k=electric+rat+trap", "brand": "Victor"},
+            ]
+        },
+    ]
+    return render(request, 'myapp/tools.html', {'tool_categories': tool_categories})
 
 def about(request):
     return render(request, 'myapp/about.html')
@@ -107,21 +164,128 @@ def resources(request):
     return render(request, 'myapp/resources.html')
 @login_required
 def resources_view(request):
-    # Get category choices from model
-    categories = []
-    for choice in ResourceItem.CATEGORY_CHOICES:
-        category_slug, category_name = choice
-        items = ResourceItem.objects.filter(category=category_slug)
-        categories.append({
-            'slug': category_slug,
-            'name': category_name,
-            'items': items
-        })
-    
-    context = {
-        'categories': categories
-    }
-    return render(request, 'myapp/resources.html', context)
+    """Resources page with comprehensive Amazon product categories."""
+    categories = [
+        {
+            "name": "Seeds & Planting Material",
+            "icon": "🌱",
+            "items": [
+                {"title": "Hybrid Tomato Seeds (Arka Rakshak)", "img": "https://placehold.co/500x500/10b981/ffffff?text=Hybrid%20Tomato%20Seeds%20%28Arka", "link": "https://www.amazon.in/s?k=hybrid+tomato+seeds+arka+rakshak", "price_range": "₹45-200"},
+                {"title": "Cucumber Seeds F1 Hybrid (50 seeds)", "img": "https://placehold.co/500x500/10b981/ffffff?text=Cucumber%20Seeds%20F1%20Hybrid", "link": "https://www.amazon.in/s?k=cucumber+f1+hybrid+seeds", "price_range": "₹55-150"},
+                {"title": "Marigold Flower Seeds Mix (500 seeds)", "img": "https://placehold.co/500x500/10b981/ffffff?text=Marigold%20Flower%20Seeds%20Mix", "link": "https://www.amazon.in/s?k=marigold+seeds+500", "price_range": "₹99-299"},
+                {"title": "Green Chilli Seeds Hybrid", "img": "https://placehold.co/500x500/10b981/ffffff?text=Green%20Chilli%20Seeds%20Hybrid", "link": "https://www.amazon.in/s?k=green+chilli+seeds+hybrid", "price_range": "₹49-199"},
+                {"title": "Spinach Seeds Palak (250g)", "img": "https://placehold.co/500x500/10b981/ffffff?text=Spinach%20Seeds%20Palak%20%28250g%29", "link": "https://www.amazon.in/s?k=spinach+palak+seeds+250g", "price_range": "₹49-149"},
+                {"title": "Bitter Gourd Karela Seeds Hybrid", "img": "https://placehold.co/500x500/10b981/ffffff?text=Bitter%20Gourd%20Karela%20Seeds", "link": "https://www.amazon.in/s?k=karela+bitter+gourd+seeds", "price_range": "₹45-180"},
+                {"title": "Watermelon Seeds (Black Diamond)", "img": "https://placehold.co/500x500/10b981/ffffff?text=Watermelon%20Seeds%20%28Black%20Diamond%29", "link": "https://www.amazon.in/s?k=watermelon+seeds+hybrid", "price_range": "₹99-399"},
+                {"title": "Brinjal/Eggplant Seeds Hybrid", "img": "https://placehold.co/500x500/10b981/ffffff?text=Brinjal/Eggplant%20Seeds%20Hybrid", "link": "https://www.amazon.in/s?k=brinjal+eggplant+seeds+hybrid", "price_range": "₹45-150"},
+            ]
+        },
+        {
+            "name": "Fertilizers & Nutrients",
+            "icon": "💊",
+            "items": [
+                {"title": "Organic Vermicompost (5kg bag)", "img": "https://placehold.co/500x500/10b981/ffffff?text=Organic%20Vermicompost%20%285kg%20bag%29", "link": "https://www.amazon.in/s?k=vermicompost+5kg+organic", "price_range": "₹199-499"},
+                {"title": "NPK 19-19-19 Water Soluble (1kg)", "img": "https://placehold.co/500x500/10b981/ffffff?text=NPK%2019-19-19%20Water%20Soluble", "link": "https://www.amazon.in/s?k=npk+19+19+19+water+soluble+fertilizer", "price_range": "₹299-699"},
+                {"title": "Urea Fertilizer 1kg", "img": "https://placehold.co/500x500/10b981/ffffff?text=Urea%20Fertilizer%201kg", "link": "https://www.amazon.in/s?k=urea+fertilizer+1kg", "price_range": "₹99-249"},
+                {"title": "Neem Cake Organic Fertilizer 2kg", "img": "https://placehold.co/500x500/10b981/ffffff?text=Neem%20Cake%20Organic%20Fertilizer", "link": "https://www.amazon.in/s?k=neem+cake+fertilizer+2kg", "price_range": "₹149-399"},
+                {"title": "Potassium Humate Granules 1kg", "img": "https://placehold.co/500x500/10b981/ffffff?text=Potassium%20Humate%20Granules%201kg", "link": "https://www.amazon.in/s?k=potassium+humate+granules", "price_range": "₹399-799"},
+                {"title": "Seaweed Extract Fertilizer 250ml", "img": "https://placehold.co/500x500/10b981/ffffff?text=Seaweed%20Extract%20Fertilizer%20250ml", "link": "https://www.amazon.in/s?k=seaweed+extract+fertilizer", "price_range": "₹349-799"},
+                {"title": "Bone Meal Fertilizer 1kg", "img": "https://placehold.co/500x500/10b981/ffffff?text=Bone%20Meal%20Fertilizer%201kg", "link": "https://www.amazon.in/s?k=bone+meal+fertilizer+1kg", "price_range": "₹199-499"},
+            ]
+        },
+        {
+            "name": "Pesticides & Crop Protection",
+            "icon": "🛡️",
+            "items": [
+                {"title": "Neem Oil Cold Pressed 500ml (Bio)", "img": "https://placehold.co/500x500/10b981/ffffff?text=Neem%20Oil%20Cold%20Pressed", "link": "https://www.amazon.in/s?k=neem+oil+cold+pressed+500ml", "price_range": "₹299-699"},
+                {"title": "Copper Oxychloride Fungicide 500g", "img": "https://placehold.co/500x500/10b981/ffffff?text=Copper%20Oxychloride%20Fungicide%20500g", "link": "https://www.amazon.in/s?k=copper+oxychloride+fungicide", "price_range": "₹249-599"},
+                {"title": "Mancozeb Fungicide 500g", "img": "https://placehold.co/500x500/10b981/ffffff?text=Mancozeb%20Fungicide%20500g", "link": "https://www.amazon.in/s?k=mancozeb+fungicide+500g", "price_range": "₹199-499"},
+                {"title": "Yellow Sticky Trap Insect Board (20pcs)", "img": "https://placehold.co/500x500/10b981/ffffff?text=Yellow%20Sticky%20Trap%20Insect", "link": "https://www.amazon.in/s?k=yellow+sticky+insect+trap+agriculture", "price_range": "₹149-399"},
+                {"title": "Bio Pesticide Trichoderma 1kg", "img": "https://placehold.co/500x500/10b981/ffffff?text=Bio%20Pesticide%20Trichoderma%201kg", "link": "https://www.amazon.in/s?k=trichoderma+bio+pesticide+1kg", "price_range": "₹299-599"},
+                {"title": "Imidacloprid Insecticide 100ml", "img": "https://placehold.co/500x500/10b981/ffffff?text=Imidacloprid%20Insecticide%20100ml", "link": "https://www.amazon.in/s?k=imidacloprid+insecticide", "price_range": "₹249-549"},
+            ]
+        },
+        {
+            "name": "Irrigation Equipment",
+            "icon": "💧",
+            "items": [
+                {"title": "Complete Drip Irrigation Kit (100 Plants)", "img": "https://placehold.co/500x500/10b981/ffffff?text=Complete%20Drip%20Irrigation%20Kit", "link": "https://www.amazon.in/s?k=drip+irrigation+kit+100+plants", "price_range": "₹1,999-4,999"},
+                {"title": "Submersible Water Pump 1HP", "img": "https://placehold.co/500x500/10b981/ffffff?text=Submersible%20Water%20Pump%201HP", "link": "https://www.amazon.in/s?k=submersible+water+pump+1hp+agriculture", "price_range": "₹3,499-7,999"},
+                {"title": "Micro Sprinkler Irrigation System", "img": "https://placehold.co/500x500/10b981/ffffff?text=Micro%20Sprinkler%20Irrigation%20System", "link": "https://www.amazon.in/s?k=micro+sprinkler+irrigation+system", "price_range": "₹999-3,499"},
+                {"title": "Rain Gun Sprinkler 1 Inch", "img": "https://placehold.co/500x500/10b981/ffffff?text=Rain%20Gun%20Sprinkler%201", "link": "https://www.amazon.in/s?k=rain+gun+sprinkler+1+inch+agriculture", "price_range": "₹1,499-3,999"},
+                {"title": "PE Poly Tube 16mm Roll (100m)", "img": "https://placehold.co/500x500/10b981/ffffff?text=PE%20Poly%20Tube%2016mm", "link": "https://www.amazon.in/s?k=pe+poly+tube+16mm+drip", "price_range": "₹799-1,499"},
+            ]
+        },
+        {
+            "name": "Greenhouse & Protective Covers",
+            "icon": "🏠",
+            "items": [
+                {"title": "UV Stabilized Polyhouse Film 200 Micron", "img": "https://placehold.co/500x500/10b981/ffffff?text=UV%20Stabilized%20Polyhouse%20Film", "link": "https://www.amazon.in/s?k=polyhouse+film+uv+stabilized+greenhouse", "price_range": "₹2,999-8,999"},
+                {"title": "50% Shade Net Green 3x5 Meter", "img": "https://placehold.co/500x500/10b981/ffffff?text=50%25%20Shade%20Net%20Green", "link": "https://www.amazon.in/s?k=shade+net+50+percent+agriculture", "price_range": "₹399-999"},
+                {"title": "Anti-hail Net for Farm Protection", "img": "https://placehold.co/500x500/10b981/ffffff?text=Anti-hail%20Net%20for%20Farm", "link": "https://www.amazon.in/s?k=anti+hail+net+farm", "price_range": "₹999-3,999"},
+                {"title": "Insect-proof Net 40 Mesh Roll", "img": "https://placehold.co/500x500/10b981/ffffff?text=Insect-proof%20Net%2040%20Mesh", "link": "https://www.amazon.in/s?k=insect+proof+net+40+mesh", "price_range": "₹799-2,499"},
+                {"title": "Mulching Film Black 1.2m x 100m", "img": "https://placehold.co/500x500/10b981/ffffff?text=Mulching%20Film%20Black%201.2m", "link": "https://www.amazon.in/s?k=mulching+film+black+1.2m+agriculture", "price_range": "₹1,299-3,499"},
+            ]
+        },
+        {
+            "name": "Books & Learning Resources",
+            "icon": "📚",
+            "items": [
+                {"title": "Modern Vegetable Farming (Hindi)", "img": "https://placehold.co/500x500/10b981/ffffff?text=Modern%20Vegetable%20Farming%20%28Hindi%29", "link": "https://www.amazon.in/s?k=modern+vegetable+farming+book+hindi", "price_range": "₹199-499"},
+                {"title": "Organic Farming Complete Guide", "img": "https://placehold.co/500x500/10b981/ffffff?text=Organic%20Farming%20Complete%20Guide", "link": "https://www.amazon.in/s?k=organic+farming+complete+guide+book", "price_range": "₹299-699"},
+                {"title": "Soil Science and Management Book", "img": "https://placehold.co/500x500/10b981/ffffff?text=Soil%20Science%20and%20Management", "link": "https://www.amazon.in/s?k=soil+science+management+agriculture+book", "price_range": "₹399-899"},
+                {"title": "Drip Irrigation Design Manual", "img": "https://placehold.co/500x500/10b981/ffffff?text=Drip%20Irrigation%20Design%20Manual", "link": "https://www.amazon.in/s?k=drip+irrigation+design+manual+book", "price_range": "₹249-549"},
+                {"title": "Pest Management in Agriculture", "img": "https://placehold.co/500x500/10b981/ffffff?text=Pest%20Management%20in%20Agriculture", "link": "https://www.amazon.in/s?k=pest+management+agriculture+book", "price_range": "₹349-799"},
+            ]
+        },
+        {
+            "name": "Grow Bags & Containers",
+            "icon": "🪴",
+            "items": [
+                {"title": "HDPE Grow Bag 15L (Pack of 10)", "img": "https://placehold.co/500x500/10b981/ffffff?text=HDPE%20Grow%20Bag%2015L", "link": "https://www.amazon.in/s?k=hdpe+grow+bag+15+litre+pack+10", "price_range": "₹299-699"},
+                {"title": "Fabric Grow Bag 20L (Pack of 5)", "img": "https://placehold.co/500x500/10b981/ffffff?text=Fabric%20Grow%20Bag%2020L", "link": "https://www.amazon.in/s?k=fabric+grow+bag+20+litre", "price_range": "₹249-599"},
+                {"title": "Terracotta Pots Large 14 inch (Pack of 3)", "img": "https://placehold.co/500x500/10b981/ffffff?text=Terracotta%20Pots%20Large%2014", "link": "https://www.amazon.in/s?k=terracotta+pot+14+inch+pack+3", "price_range": "₹399-999"},
+                {"title": "Seedling Tray 98 Holes (Pack of 5)", "img": "https://placehold.co/500x500/10b981/ffffff?text=Seedling%20Tray%2098%20Holes", "link": "https://www.amazon.in/s?k=seedling+tray+98+holes", "price_range": "₹149-399"},
+                {"title": "Coir Pith Block 5kg (Expands to 75L)", "img": "https://placehold.co/500x500/10b981/ffffff?text=Coir%20Pith%20Block%205kg", "link": "https://www.amazon.in/s?k=coir+pith+block+5kg", "price_range": "₹249-599"},
+            ]
+        },
+        {
+            "name": "Safety & Protective Gear",
+            "icon": "🦺",
+            "items": [
+                {"title": "Chemical Resistant Gloves (Pair)", "img": "https://placehold.co/500x500/10b981/ffffff?text=Chemical%20Resistant%20Gloves%20%28Pair%29", "link": "https://www.amazon.in/s?k=chemical+resistant+gloves+farming", "price_range": "₹149-399"},
+                {"title": "N95 Dust Mask Respirator (10 pcs)", "img": "https://placehold.co/500x500/10b981/ffffff?text=N95%20Dust%20Mask%20Respirator", "link": "https://www.amazon.in/s?k=n95+dust+mask+farming+10+pack", "price_range": "₹199-499"},
+                {"title": "Farm Work Rain Boot/Gumboot", "img": "https://placehold.co/500x500/10b981/ffffff?text=Farm%20Work%20Rain%20Boot/Gumboot", "link": "https://www.amazon.in/s?k=gumboot+rain+boot+farming", "price_range": "₹399-999"},
+                {"title": "Protective Safety Goggles Farm", "img": "https://placehold.co/500x500/10b981/ffffff?text=Protective%20Safety%20Goggles%20Farm", "link": "https://www.amazon.in/s?k=protective+safety+goggles+farm", "price_range": "₹199-499"},
+                {"title": "Apron Chemical Resistant PVC", "img": "https://placehold.co/500x500/10b981/ffffff?text=Apron%20Chemical%20Resistant%20PVC", "link": "https://www.amazon.in/s?k=pvc+apron+chemical+resistant", "price_range": "₹299-699"},
+            ]
+        },
+    ]
+    search_query = request.GET.get('q', '').strip()
+    selected_category = request.GET.get('category', '').strip()
+
+    if search_query:
+        categories = [
+            {
+                **cat, 
+                'items': [item for item in cat['items'] if search_query.lower() in item['title'].lower()]
+            } 
+            for cat in categories
+        ]
+        categories = [cat for cat in categories if cat['items']]
+
+    if selected_category:
+        categories = [cat for cat in categories if cat['name'] == selected_category]
+
+    all_category_names = [
+        "Seeds & Planting Material", "Fertilizers & Nutrients", "Pesticides & Crop Protection",
+        "Irrigation Equipment", "Greenhouse & Protective Covers", "Books & Learning Resources",
+        "Grow Bags & Containers", "Safety & Protective Gear",
+    ]
+    return render(request, 'myapp/resources.html', {
+        'categories': categories, 'search_query': search_query, 
+        'selected_category': selected_category, 'all_category_names': all_category_names,
+    })
 @login_required
 def market(request):
     crops = Crop.objects.prefetch_related('historical_prices').all().order_by('name')
@@ -467,8 +631,13 @@ def details(request, polygon_identifier=None, polygon_id=None):
 
 
 # Import AI model utilities
-from keras.models import load_model
-from keras.preprocessing.image import img_to_array, load_img
+try:
+    from keras.models import load_model
+    from keras.preprocessing.image import img_to_array, load_img
+    import numpy as np
+    KERAS_AVAILABLE = True
+except ImportError:
+    KERAS_AVAILABLE = False
 
 # Define model path for the new plant disease recognition model
 MODEL_PATH = 'C:\\Users\\Asus\\OneDrive\\Desktop\\gc\\AgroBrain\\model\\plant_disease_recog_model_pwp.keras'
@@ -478,9 +647,13 @@ model = None
 
 # Try to load the trained model, but handle the case when it's not available
 try:
-    model = load_model(MODEL_PATH)
-    MODEL_AVAILABLE = True
-    print("Successfully loaded plant disease recognition model")
+    if KERAS_AVAILABLE:
+        model = load_model(MODEL_PATH)
+        MODEL_AVAILABLE = True
+        print("Successfully loaded plant disease recognition model")
+    else:
+        MODEL_AVAILABLE = False
+        print("Keras is not available; plant disease model disabled")
 except Exception as e:
     print(f"Error loading model: {str(e)}")
     MODEL_AVAILABLE = False
@@ -725,8 +898,7 @@ def download_report(request):
 
 
 
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
+
 
 @login_required
 def delete_report(request, timestamp=None):
@@ -780,3 +952,282 @@ def delete_report(request, timestamp=None):
             messages.success(request, "Report deleted successfully.")
 
     return redirect("plant_health_results")
+
+
+# ─── AI Farming Assistant (Gemini) ────────────────────────────────────────────
+@csrf_exempt
+@login_required
+def ai_chat(request):
+    """Gemini-powered farming assistant chat endpoint."""
+    if request.method == "POST":
+        try:
+            body = json.loads(request.body)
+            user_message = body.get("message", "").strip()
+            if not user_message:
+                return JsonResponse({"error": "Empty message"}, status=400)
+
+            gemini_api_key = getattr(settings, "GEMINI_API_KEY", None)
+            if not gemini_api_key:
+                return JsonResponse({"reply": "AI assistant is not configured. Please contact support."})
+
+            # Add farming context to the system prompt
+            system_prompt = (
+                "You are AgroBrain AI, an expert agricultural assistant. "
+                "You help farmers with crop management, pest control, soil health, irrigation, "
+                "weather impact analysis, market trends, and all farming-related queries. "
+                "Provide practical, concise, and actionable advice. "
+                "Reply in the same language the user writes in."
+            )
+
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={gemini_api_key}"
+            payload = {
+                "contents": [
+                    {
+                        "parts": [
+                            {"text": f"{system_prompt}\n\nUser: {user_message}"}
+                        ]
+                    }
+                ]
+            }
+            response = requests.post(url, json=payload, timeout=30)
+            if response.status_code == 200:
+                data = response.json()
+                reply = data["candidates"][0]["content"]["parts"][0]["text"]
+                return JsonResponse({"reply": reply})
+            else:
+                return JsonResponse({"reply": "I'm having trouble connecting right now. Please try again in a moment."})
+        except Exception as e:
+            print(f"AI chat error: {e}")
+            return JsonResponse({"reply": "An error occurred. Please try again."})
+    return JsonResponse({"error": "Method not allowed"}, status=405)
+
+
+# ─── Crop Recommendation ───────────────────────────────────────────────────────
+@login_required
+def crop_recommendation(request):
+    """AI-powered crop recommendation based on soil/weather input."""
+    result = None
+    if request.method == "POST":
+        soil_type = request.POST.get("soil_type", "")
+        ph_level = request.POST.get("ph_level", "")
+        region = request.POST.get("region", "")
+        season = request.POST.get("season", "")
+        rainfall = request.POST.get("rainfall", "")
+        temperature = request.POST.get("temperature", "")
+
+        gemini_api_key = getattr(settings, "GEMINI_API_KEY", None)
+        if gemini_api_key:
+            prompt = (
+                f"You are an expert agronomist. Based on the following farm conditions, "
+                f"recommend the TOP 5 most suitable crops and explain why each is suitable. "
+                f"Also provide basic cultivation tips for each crop.\n\n"
+                f"Farm Conditions:\n"
+                f"- Soil Type: {soil_type}\n"
+                f"- Soil pH: {ph_level}\n"
+                f"- Region/Location: {region}\n"
+                f"- Season: {season}\n"
+                f"- Annual Rainfall: {rainfall} mm\n"
+                f"- Average Temperature: {temperature} °C\n\n"
+                f"Format your response as:\n"
+                f"1. [Crop Name] - Why suitable: ... | Tips: ...\n"
+                f"2. [Crop Name] - Why suitable: ... | Tips: ...\n"
+                f"(and so on for 5 crops)"
+            )
+            try:
+                url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={gemini_api_key}"
+                payload = {"contents": [{"parts": [{"text": prompt}]}]}
+                response = requests.post(url, json=payload, timeout=30)
+                if response.status_code == 200:
+                    data = response.json()
+                    result = data["candidates"][0]["content"]["parts"][0]["text"]
+                else:
+                    result = "Unable to get AI recommendations at this time. Please try again."
+            except Exception as e:
+                result = f"Error getting recommendations: {str(e)}"
+        else:
+            result = "AI service not configured."
+
+    context = {
+        "result": result,
+        "soil_types": ["Sandy", "Clay", "Loamy", "Silt", "Peat", "Chalky", "Black Cotton", "Red Laterite", "Alluvial"],
+        "seasons": ["Kharif (Monsoon)", "Rabi (Winter)", "Zaid (Summer)", "Year-round"],
+    }
+    return render(request, "myapp/crop_recommendation.html", context)
+
+
+# ─── Contact Form ──────────────────────────────────────────────────────────────
+def contact(request):
+    """Contact/feedback form view."""
+    if request.method == "POST":
+        name = request.POST.get("name", "").strip()
+        email = request.POST.get("email", "").strip()
+        subject = request.POST.get("subject", "").strip()
+        message = request.POST.get("message", "").strip()
+
+        if name and email and message:
+            # In production, send email here. For now, save to session.
+            request.session["contact_submitted"] = True
+            messages.success(request, f"Thank you {name}! Your message has been received. We'll respond to {email} shortly.")
+            return redirect("contact")
+        else:
+            messages.error(request, "Please fill in all required fields.")
+
+    return render(request, "myapp/contact.html")
+
+
+# ─── User Profile ──────────────────────────────────────────────────────────────
+@login_required
+def profile(request):
+    """User profile page."""
+    user = request.user
+    # Get user's polygons
+    user_polygons = Polygon.objects.all()  # Show all polygons for now
+
+    if request.method == "POST":
+        # Allow updating first/last name and email
+        first_name = request.POST.get("first_name", "").strip()
+        last_name = request.POST.get("last_name", "").strip()
+        email = request.POST.get("email", "").strip()
+
+        if first_name:
+            user.first_name = first_name
+        if last_name:
+            user.last_name = last_name
+        if email:
+            user.email = email
+        user.save()
+        messages.success(request, "Profile updated successfully!")
+        return redirect("profile")
+
+    db_reports = []
+    try:
+        from .models import PlantHealthReport
+        db_reports = PlantHealthReport.objects.filter(user=user).order_by("-timestamp")[:5]
+    except Exception:
+        pass
+
+    context = {
+        "user": user,
+        "polygons": user_polygons,
+        "db_reports": db_reports,
+        "total_reports": len(db_reports),
+    }
+    return render(request, "myapp/profile.html", context)
+
+
+# ─── Soil Calculator ───────────────────────────────────────────────────────────
+@login_required
+def soil_calculator(request):
+    """Soil health calculator and fertilizer recommendation tool."""
+    result = None
+    if request.method == "POST":
+        nitrogen = request.POST.get("nitrogen", "0")
+        phosphorus = request.POST.get("phosphorus", "0")
+        potassium = request.POST.get("potassium", "0")
+        ph = request.POST.get("ph", "7")
+        crop = request.POST.get("crop", "")
+
+        try:
+            n = float(nitrogen)
+            p = float(phosphorus)
+            k = float(potassium)
+            ph_val = float(ph)
+
+            recommendations = []
+            # Nitrogen recommendations
+            if n < 200:
+                recommendations.append(f"🟡 Nitrogen is LOW ({n} kg/ha). Apply Urea (46% N) at 2-3 bags/acre or use compost/green manure.")
+            elif n > 400:
+                recommendations.append(f"🔴 Nitrogen is HIGH ({n} kg/ha). Reduce nitrogenous fertilizer. Risk of groundwater contamination.")
+            else:
+                recommendations.append(f"🟢 Nitrogen level is OPTIMAL ({n} kg/ha). Maintain current management.")
+
+            # Phosphorus recommendations
+            if p < 10:
+                recommendations.append(f"🟡 Phosphorus is LOW ({p} kg/ha). Apply Single Superphosphate (16% P2O5) or DAP at planting.")
+            elif p > 50:
+                recommendations.append(f"🔴 Phosphorus is HIGH ({p} kg/ha). Avoid phosphorus fertilizers this season.")
+            else:
+                recommendations.append(f"🟢 Phosphorus level is OPTIMAL ({p} kg/ha).")
+
+            # Potassium recommendations
+            if k < 100:
+                recommendations.append(f"🟡 Potassium is LOW ({k} kg/ha). Apply Muriate of Potash (60% K2O) at 1-2 bags/acre.")
+            elif k > 500:
+                recommendations.append(f"🔴 Potassium is HIGH ({k} kg/ha). No K fertilizer needed.")
+            else:
+                recommendations.append(f"🟢 Potassium level is OPTIMAL ({k} kg/ha).")
+
+            # pH recommendations
+            if ph_val < 5.5:
+                recommendations.append(f"🔴 Soil is ACIDIC (pH {ph_val}). Apply agricultural lime at 2-4 tonnes/acre to raise pH.")
+            elif ph_val > 8.0:
+                recommendations.append(f"🔴 Soil is ALKALINE (pH {ph_val}). Apply gypsum or sulfur to lower pH.")
+            elif 6.0 <= ph_val <= 7.5:
+                recommendations.append(f"🟢 Soil pH is IDEAL ({ph_val}) for most crops.")
+            else:
+                recommendations.append(f"🟡 Soil pH is slightly off ({ph_val}). Monitor closely.")
+
+            if crop:
+                recommendations.append(f"\n🌾 Special note for {crop}: Ensure balanced NPK ratio based on crop's growth stage.")
+
+            result = recommendations
+        except ValueError:
+            messages.error(request, "Please enter valid numeric values.")
+
+    crops = ["Wheat", "Rice", "Maize", "Cotton", "Sugarcane", "Tomato", "Potato", "Soybean", "Pulses", "Groundnut"]
+    return render(request, "myapp/soil_calculator.html", {"result": result, "crops": crops})
+
+
+# ─── Irrigation Planner ────────────────────────────────────────────────────────
+@login_required
+def irrigation_planner(request):
+    """Smart irrigation scheduling tool."""
+    schedule = None
+    if request.method == "POST":
+        crop_type = request.POST.get("crop_type", "")
+        area = request.POST.get("area", "1")
+        soil_type = request.POST.get("soil_type", "Loamy")
+        growth_stage = request.POST.get("growth_stage", "Vegetative")
+        last_irrigation = request.POST.get("last_irrigation", "")
+
+        try:
+            area_val = float(area)
+            # Water requirement data (liters per hectare per day)
+            water_requirements = {
+                "Wheat": {"Germination": 400, "Vegetative": 600, "Flowering": 800, "Maturity": 400},
+                "Rice": {"Germination": 2000, "Vegetative": 3000, "Flowering": 4000, "Maturity": 2000},
+                "Maize": {"Germination": 500, "Vegetative": 700, "Flowering": 900, "Maturity": 500},
+                "Cotton": {"Germination": 400, "Vegetative": 600, "Flowering": 800, "Maturity": 400},
+                "Tomato": {"Germination": 600, "Vegetative": 800, "Flowering": 1000, "Maturity": 600},
+                "Sugarcane": {"Germination": 1500, "Vegetative": 2000, "Flowering": 2500, "Maturity": 1000},
+            }
+
+            # Soil retention factor
+            soil_factors = {"Sandy": 0.7, "Loamy": 1.0, "Clay": 1.3, "Silt": 1.1, "Black Cotton": 1.4}
+            factor = soil_factors.get(soil_type, 1.0)
+
+            base_requirement = water_requirements.get(crop_type, {}).get(growth_stage, 600)
+            daily_water = base_requirement * factor * area_val / 1000  # Convert to cubic meters
+
+            schedule = {
+                "crop": crop_type,
+                "area": area_val,
+                "growth_stage": growth_stage,
+                "soil_type": soil_type,
+                "daily_water_m3": round(daily_water, 2),
+                "daily_water_liters": round(daily_water * 1000, 0),
+                "weekly_water_m3": round(daily_water * 7, 2),
+                "irrigation_frequency": "Every 3-4 days" if soil_type in ["Sandy"] else "Every 5-7 days",
+                "best_time": "Early morning (5-8 AM) or evening (6-8 PM)",
+                "method": "Drip irrigation recommended for water efficiency" if crop_type in ["Tomato", "Cotton"] else "Sprinkler or flood irrigation",
+            }
+        except ValueError:
+            messages.error(request, "Please enter valid values.")
+
+    crops = ["Wheat", "Rice", "Maize", "Cotton", "Tomato", "Sugarcane", "Potato", "Groundnut"]
+    soil_types = ["Sandy", "Loamy", "Clay", "Silt", "Black Cotton"]
+    growth_stages = ["Germination", "Vegetative", "Flowering", "Maturity"]
+    return render(request, "myapp/irrigation_planner.html", {
+        "schedule": schedule, "crops": crops, "soil_types": soil_types, "growth_stages": growth_stages
+    })

@@ -1,41 +1,146 @@
 {% extends "myapp/base.html" %}
 
-{% block title %}Resources{% endblock %}
+{% block title %}Smart Farming Resources | AgroBrain{% endblock %}
 
 {% block content %}
-<div class="bg-emerald-50 min-h-screen px-4 sm:px-6 lg:px-8 py-8">
-    <div class="max-w-6xl mx-auto">
-        <!-- Main Container -->
-        <div class="bg-white rounded-2xl shadow-sm p-6 mb-8 border border-emerald-100">
-            <h1 class="text-emerald-800 text-3xl font-bold text-center mb-8">Resources</h1>
-            
-            <!-- Categories Section -->
-            <div class="space-y-16">
-                {% for category in categories %}
-                <div>
-                    <h2 class="text-emerald-800 text-2xl font-bold mb-8 border-b-2 border-emerald-100 pb-2">
-                        {{ forloop.counter }}. {{ category.name }}
-                    </h2>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-                        {% for item in category.items %}
-                        <div class="bg-white p-4 rounded-lg shadow-md border border-emerald-100 relative">
-                            <a href="{{ item.link }}" target="_blank">
-                                <img src="{{ item.img_url }}" alt="{{ item.title }}" 
-                                     class="w-full h-48 object-cover rounded-md transition-transform transform hover:scale-105">
+<div class="bg-emerald-50/50 dark-theme:bg-emerald-950 min-h-screen py-8 pb-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        <!-- Header Section -->
+        <div class="text-center mb-10 animate-on-load">
+            <h1
+                class="text-3xl md:text-4xl font-extrabold text-emerald-900 dark-theme:text-emerald-100 mb-4 tracking-tight">
+                Recommended Resources
+            </h1>
+            <p class="text-emerald-700 dark-theme:text-emerald-300 max-w-2xl mx-auto text-lg mb-8">
+                Curated seeds, fertilizers, and agricultural equipment to maximize your farm's yield, available on
+                Amazon.
+            </p>
+
+            <!-- Search and Filter Form -->
+            <form method="GET" action="{% url 'resources' %}" class="max-w-3xl mx-auto">
+                <div class="relative flex items-center mb-6">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <svg class="h-5 w-5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+                    <input type="text" name="q" value="{{ search_query }}"
+                        placeholder="Search resources (e.g., 'Tomato Seeds', 'Fertilizer')..."
+                        class="block w-full pl-11 pr-4 py-4 border border-emerald-200 dark-theme:border-emerald-700 rounded-xl leading-5 bg-white dark-theme:bg-emerald-800 text-emerald-900 dark-theme:text-emerald-100 placeholder-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 sm:text-lg shadow-sm transition-shadow">
+                    <button type="submit"
+                        class="absolute right-2 top-2 bottom-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg px-6 transition-colors shadow-sm">
+                        Search
+                    </button>
+                </div>
+
+                <!-- Category Filters (Pills) -->
+                <div class="flex flex-wrap justify-center gap-2 mb-4">
+                    <button type="submit" name="category" value=""
+                        class="px-4 py-2 rounded-full text-sm font-medium transition-colors border {% if not selected_category %}bg-emerald-600 text-white border-emerald-600 shadow-md{% else %}bg-white dark-theme:bg-emerald-800 text-emerald-700 dark-theme:text-emerald-300 border-emerald-200 dark-theme:border-emerald-700 hover:bg-emerald-50 dark-theme:hover:bg-emerald-700{% endif %}">
+                        All Items
+                    </button>
+                    {% for cat_name in all_category_names %}
+                    <button type="submit" name="category" value="{{ cat_name }}"
+                        class="px-4 py-2 rounded-full text-sm font-medium transition-colors border {% if selected_category == cat_name %}bg-emerald-600 text-white border-emerald-600 shadow-md{% else %}bg-white dark-theme:bg-emerald-800 text-emerald-700 dark-theme:text-emerald-300 border-emerald-200 dark-theme:border-emerald-700 hover:bg-emerald-50 dark-theme:hover:bg-emerald-700{% endif %}">
+                        {{ cat_name }}
+                    </button>
+                    {% endfor %}
+                </div>
+            </form>
+        </div>
+
+        {% if not categories %}
+        <!-- Empty State -->
+        <div
+            class="bg-white dark-theme:bg-emerald-800 rounded-2xl shadow-sm border border-emerald-100 dark-theme:border-emerald-700 p-12 text-center animate-on-load">
+            <div
+                class="w-20 h-20 bg-emerald-100 dark-theme:bg-emerald-900/50 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg class="w-10 h-10 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+            </div>
+            <h3 class="text-xl font-bold text-emerald-900 dark-theme:text-white mb-2">No resources found</h3>
+            <p class="text-emerald-600 dark-theme:text-emerald-400">We couldn't find any items matching your search
+                criteria.</p>
+            <a href="{% url 'resources' %}"
+                class="inline-block mt-6 px-6 py-2.5 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition">Clear
+                Search</a>
+        </div>
+        {% else %}
+
+        <!-- Categories and Products -->
+        <div class="space-y-12">
+            {% for category in categories %}
+            <div class="animate-on-load">
+                <div class="flex items-center mb-6 border-b border-emerald-200 dark-theme:border-emerald-800 pb-3">
+                    <span class="text-3xl mr-3">{{ category.icon }}</span>
+                    <h2 class="text-2xl font-bold text-emerald-900 dark-theme:text-emerald-100">{{ category.name }}</h2>
+                    <span
+                        class="ml-4 bg-emerald-100 dark-theme:bg-emerald-900/50 text-emerald-800 dark-theme:text-emerald-200 py-1 px-3 rounded-full text-xs font-semibold">{{
+                        category.items|length }} items</span>
+                </div>
+
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                {% for item in category.items %}
+                <!-- Product Card -->
+                <div
+                    class="group bg-white dark-theme:bg-emerald-800 rounded-2xl shadow-sm hover:shadow-xl border border-emerald-100 dark-theme:border-emerald-700 overflow-hidden flex flex-col transition-all duration-300 transform hover:-translate-y-1">
+                    <!-- Image Container with Affiliate Overlay -->
+                    <div class="relative h-48 bg-white overflow-hidden flex items-center justify-center p-4">
+                        <span
+                            class="absolute top-2 left-2 bg-yellow-400 text-black text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wide z-10 shadow-sm">Amazon</span>
+                        <img src="{{ item.img }}" alt="{{ item.title }}" referrerpolicy="no-referrer"
+                            class="h-full object-contain group-hover:scale-110 transition-transform duration-500">
+                        <div
+                            class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center p-4">
+                            <a href="{{ item.link }}" target="_blank" rel="noopener noreferrer"
+                                class="bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold py-2 px-4 rounded-full shadow-lg transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 flex items-center">
+                                View on Amazon
+                                <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                </svg>
                             </a>
-                            <div class="mt-4">
-                                <h3 class="text-lg font-semibold text-emerald-800">{{ item.title }}</h3>
-                                <div class="mt-2 text-sm">
-                                    <span class="text-emerald-600 font-medium">{{ item.price_range }}</span>
-                                </div>
-                            </div>
                         </div>
-                        {% endfor %}
+                    </div>
+
+                    <!-- Content -->
+                    <div class="p-5 flex flex-col flex-grow bg-emerald-50/30 dark-theme:bg-emerald-900/20">
+                        <h3 class="text-md font-bold text-emerald-900 dark-theme:text-emerald-100 flex-grow mb-3 line-clamp-2"
+                            title="{{ item.title }}">
+                            {{ item.title }}
+                        </h3>
+                        <div
+                            class="flex items-center justify-between mt-auto pt-4 border-t border-emerald-100 dark-theme:border-emerald-800">
+                            <div class="flex flex-col">
+                                <span
+                                    class="text-[11px] text-emerald-600 dark-theme:text-emerald-400 uppercase font-semibold tracking-wider">Est.
+                                    Price</span>
+                                <span class="text-lg font-bold text-emerald-800 dark-theme:text-emerald-200">{{
+                                    item.price_range }}</span>
+                            </div>
+                            <a href="{{ item.link }}" target="_blank"
+                                class="w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 dark-theme:bg-emerald-700 dark-theme:hover:bg-emerald-600 flex items-center justify-center text-emerald-700 dark-theme:text-emerald-300 transition-colors">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                                </svg>
+                            </a>
+                        </div>
                     </div>
                 </div>
                 {% endfor %}
             </div>
         </div>
+        {% endfor %}
     </div>
+    {% endif %}
+
+</div>
 </div>
 {% endblock %}

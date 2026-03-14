@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700;900&family=Noto+Sans:wght@400;500;700;900&display=swap">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700;900&family=Noto+Sans:wght@400;500;700;900&display=swap">
     <title>AgroBrain</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
@@ -24,22 +26,22 @@
             --shadow-light: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             --shadow-dark: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.12);
         }
-        
+
         body {
             font-family: 'Be Vietnam Pro', 'Noto Sans', sans-serif;
         }
-        
+
         * {
             transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out, border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
         }
-        
+
         /* Plant Growth Animation */
         .plant-growth {
             position: relative;
             width: 24px;
             height: 24px;
         }
-        
+
         .plant-stem {
             position: absolute;
             bottom: 0;
@@ -51,7 +53,7 @@
             animation: grow-stem 2s ease-out forwards;
             transform-origin: bottom center;
         }
-        
+
         .plant-leaf {
             position: absolute;
             width: 8px;
@@ -61,48 +63,50 @@
             opacity: 0;
             transform: scale(0);
         }
-        
+
         .plant-leaf:nth-child(2) {
             top: 8px;
             left: 8px;
             transform: rotate(-45deg) scale(0);
             animation: grow-leaf 0.5s ease-out 0.5s forwards;
         }
-        
+
         .plant-leaf:nth-child(3) {
             top: 4px;
             left: 12px;
             transform: rotate(0deg) scale(0);
             animation: grow-leaf 0.5s ease-out 1s forwards;
         }
-        
+
         .plant-leaf:nth-child(4) {
             top: 8px;
             right: 8px;
             transform: rotate(45deg) scale(0);
             animation: grow-leaf 0.5s ease-out 1.5s forwards;
         }
-        
+
         @keyframes grow-stem {
             from {
                 height: 0;
             }
+
             to {
                 height: 12px;
             }
         }
-        
+
         @keyframes grow-leaf {
             from {
                 opacity: 0;
                 transform: rotate(var(--rotation, 0deg)) scale(0);
             }
+
             to {
                 opacity: 1;
                 transform: rotate(var(--rotation, 0deg)) scale(1);
             }
         }
-        
+
         /* Page Loading Animation */
         .page-transition {
             position: fixed;
@@ -117,46 +121,46 @@
             align-items: center;
             transition: opacity 0.5s ease-out;
         }
-        
+
         .page-transition.loaded {
             opacity: 0;
             pointer-events: none;
         }
-        
+
         .page-transition .plant-growth {
             width: 60px;
             height: 60px;
         }
-        
+
         .page-transition .plant-stem {
             width: 4px;
             height: 30px;
             animation: grow-stem 1.5s ease-out infinite;
         }
-        
+
         .page-transition .plant-leaf {
             width: 20px;
             height: 20px;
         }
-        
+
         .page-transition .plant-leaf:nth-child(2) {
             top: 20px;
             left: 20px;
             animation: grow-leaf 1s ease-out 0.5s infinite;
         }
-        
+
         .page-transition .plant-leaf:nth-child(3) {
             top: 10px;
             left: 30px;
             animation: grow-leaf 1s ease-out 1s infinite;
         }
-        
+
         .page-transition .plant-leaf:nth-child(4) {
             top: 20px;
             right: 20px;
             animation: grow-leaf 1s ease-out 1.5s infinite;
         }
-        
+
         /* Theme Toggle */
         .theme-toggle {
             position: relative;
@@ -167,7 +171,7 @@
             cursor: pointer;
             transition: background-color 0.3s ease;
         }
-        
+
         .theme-toggle::after {
             content: '';
             position: absolute;
@@ -179,28 +183,33 @@
             background-color: white;
             transition: transform 0.3s ease;
         }
-        
+
         .dark-theme .theme-toggle::after {
             transform: translateX(24px);
         }
-        
+
         /* Other existing styles */
         .hamburger {
             transition: all 0.3s ease-in-out;
         }
+
         .hamburger-line {
             transition: all 0.3s ease-in-out;
             transform-origin: center;
         }
+
         .hamburger.active .hamburger-line-top {
             transform: translateY(4px) rotate(45deg);
         }
+
         .hamburger.active .hamburger-line-middle {
             opacity: 0;
         }
+
         .hamburger.active .hamburger-line-bottom {
             transform: translateY(-4px) rotate(-45deg);
         }
+
         .profile-menu {
             opacity: 0;
             transform: translateY(-10px);
@@ -208,19 +217,23 @@
             box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
             border: 1px solid rgba(0, 0, 0, 0.05);
         }
+
         .profile-menu.active {
             opacity: 1;
             transform: translateY(0);
             visibility: visible;
         }
+
         .profile-item:hover {
             background: rgba(243, 244, 246, 0.5);
             transform: translateX(4px);
         }
+
         .nav-link {
             position: relative;
             padding: 8px 0;
         }
+
         .nav-link::after {
             content: '';
             position: absolute;
@@ -231,12 +244,15 @@
             background: var(--primary-color);
             transition: all 0.3s ease;
         }
+
         .nav-link:hover::after {
             width: 100%;
         }
+
         .nav-link:hover {
             color: var(--primary-color);
         }
+
         #mobile-menu {
             transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
             transform: translateY(-10px);
@@ -244,6 +260,7 @@
             pointer-events: none;
             visibility: hidden;
         }
+
         #mobile-menu.menu-open {
             transform: translateY(0);
             opacity: 1;
@@ -253,6 +270,7 @@
         }
     </style>
 </head>
+
 <body class="bg-light-bg text-dark-text">
     <!-- Page Loading Animation -->
     <div class="page-transition" id="page-transition">
@@ -263,7 +281,7 @@
             <div class="plant-leaf"></div>
         </div>
     </div>
-    
+
     {% if messages %}
     <div class="messages-container fixed top-20 right-4 z-50">
         {% for message in messages %}
@@ -276,7 +294,7 @@
         {% endfor %}
     </div>
     {% endif %}
-    
+
     <div class="relative flex size-full min-h-screen flex-col bg-white group/design-root overflow-x-hidden">
         <div class="layout-container flex h-full grow flex-col">
             <!-- Include Header Partial -->
@@ -297,14 +315,14 @@
         document.addEventListener('DOMContentLoaded', () => {
             // Page Loading Animation
             const pageTransition = document.getElementById('page-transition');
-            
+
             // Hide loading animation after page loads
             window.addEventListener('load', () => {
                 setTimeout(() => {
                     pageTransition.classList.add('loaded');
                 }, 800); // Delay to ensure animation is visible
             });
-            
+
             // Show loading animation when navigating to a new page
             document.querySelectorAll('a[href]:not([href^="#"])').forEach(link => {
                 link.addEventListener('click', (e) => {
@@ -312,20 +330,20 @@
                     if (link.target === '_blank' || link.hasAttribute('download') || e.ctrlKey || e.metaKey) {
                         return;
                     }
-                    
+
                     e.preventDefault();
                     pageTransition.classList.remove('loaded');
-                    
+
                     setTimeout(() => {
                         window.location.href = link.href;
                     }, 500);
                 });
             });
-            
+
             // Theme Toggle
             const themeToggle = document.getElementById('theme-toggle');
             const htmlElement = document.documentElement;
-            
+
             // Check for saved theme preference
             const savedTheme = localStorage.getItem('theme');
             if (savedTheme === 'dark') {
@@ -335,22 +353,22 @@
             } else {
                 document.body.classList.add('bg-light-bg', 'text-dark-text');
             }
-            
+
             // Toggle theme when button is clicked
             if (themeToggle) {
                 themeToggle.addEventListener('click', () => {
                     // Add transition class to body for smoother theme change
                     document.body.classList.add('theme-transition');
-                    
+
                     // Toggle dark theme class
                     htmlElement.classList.toggle('dark-theme');
-                    
+
                     // Update theme in localStorage and apply appropriate styles
                     if (htmlElement.classList.contains('dark-theme')) {
                         localStorage.setItem('theme', 'dark');
                         document.body.classList.remove('bg-light-bg', 'text-dark-text');
                         document.body.classList.add('bg-dark-bg', 'text-light-text');
-                        
+
                         // Apply transition to all interactive elements
                         setTimeout(() => {
                             document.querySelectorAll('a, button, input, select, .nav-link').forEach(el => {
@@ -361,7 +379,7 @@
                         localStorage.setItem('theme', 'light');
                         document.body.classList.remove('bg-dark-bg', 'text-light-text');
                         document.body.classList.add('bg-light-bg', 'text-dark-text');
-                        
+
                         // Apply transition to all interactive elements
                         setTimeout(() => {
                             document.querySelectorAll('a, button, input, select, .nav-link').forEach(el => {
@@ -369,18 +387,18 @@
                             });
                         }, 50);
                     }
-                    
+
                     // Remove transition class after theme change is complete
                     setTimeout(() => {
                         document.body.classList.remove('theme-transition');
                     }, 500);
                 });
             }
-            
+
             // Mobile Menu
             const mobileMenuButton = document.getElementById('mobile-menu-button');
             const mobileMenu = document.getElementById('mobile-menu');
-            
+
             if (mobileMenuButton && mobileMenu) {
                 mobileMenuButton.addEventListener('click', () => {
                     mobileMenu.classList.toggle('menu-open');
@@ -405,7 +423,7 @@
             // Profile Dropdown
             const userMenuButton = document.querySelector('.relative.group');
             const userMenu = document.getElementById('user-menu');
-            
+
             if (userMenuButton && userMenu) {
                 userMenuButton.addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -424,7 +442,7 @@
                     }
                 });
             }
-            
+
             // Staggered animation for content elements
             const animateElements = document.querySelectorAll('.animate-on-load');
             if (animateElements.length > 0) {
@@ -436,5 +454,259 @@
             }
         });
     </script>
+
+    {% if user.is_authenticated %}
+    <!-- ═══ AI Farming Chat Widget ═══════════════════════════════════════════ -->
+    <style>
+        #ai-chat-widget {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 9999;
+            font-family: inherit;
+        }
+
+        #ai-chat-toggle {
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #059669, #0d9488);
+            color: white;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(5, 150, 105, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            transition: transform .2s, box-shadow .2s;
+        }
+
+        #ai-chat-toggle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(5, 150, 105, 0.5);
+        }
+
+        #ai-chat-box {
+            display: none;
+            position: fixed;
+            bottom: 90px;
+            right: 24px;
+            width: 350px;
+            max-height: 520px;
+            background: white;
+            border-radius: 18px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, .2);
+            overflow: hidden;
+            flex-direction: column;
+            z-index: 9999;
+            border: 1px solid #d1fae5;
+        }
+
+        #ai-chat-box.open {
+            display: flex;
+        }
+
+        #ai-chat-header {
+            background: linear-gradient(135deg, #059669, #0d9488);
+            color: white;
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        #ai-chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 360px;
+        }
+
+        .chat-msg {
+            max-width: 82%;
+            border-radius: 12px;
+            padding: 10px 14px;
+            font-size: 13.5px;
+            line-height: 1.5;
+        }
+
+        .chat-msg.user {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #059669, #0d9488);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .chat-msg.bot {
+            align-self: flex-start;
+            background: #f0fdf4;
+            color: #1f2937;
+            border: 1px solid #d1fae5;
+            border-bottom-left-radius: 4px;
+        }
+
+        .chat-msg.typing {
+            background: #f0fdf4;
+            color: #4b5563;
+            border: 1px solid #d1fae5;
+            font-style: italic;
+        }
+
+        #ai-chat-input-area {
+            padding: 12px 14px;
+            border-top: 1px solid #d1fae5;
+            display: flex;
+            gap: 8px;
+            background: #f9fafb;
+        }
+
+        #ai-chat-input {
+            flex: 1;
+            border: 1px solid #d1fae5;
+            border-radius: 10px;
+            padding: 8px 12px;
+            font-size: 13px;
+            resize: none;
+            outline: none;
+            font-family: inherit;
+        }
+
+        #ai-chat-input:focus {
+            border-color: #059669;
+            box-shadow: 0 0 0 2px rgba(5, 150, 105, .15);
+        }
+
+        #ai-send-btn {
+            background: #059669;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 8px 14px;
+            cursor: pointer;
+            font-size: 17px;
+            transition: background .2s;
+        }
+
+        #ai-send-btn:hover {
+            background: #047857;
+        }
+
+        #ai-send-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .chat-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 12px;
+            height: 12px;
+            background: #10b981;
+            border-radius: 50%;
+            border: 2px solid white;
+            animation: pulse 2s infinite;
+        }
+    </style>
+
+    <div id="ai-chat-widget">
+        <div id="ai-chat-box">
+            <div id="ai-chat-header">
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <div
+                        style="width:38px;height:38px;background:rgba(255,255,255,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;">
+                        🌿</div>
+                    <div>
+                        <div style="font-weight:700;font-size:14px;">AgroBrain AI</div>
+                        <div style="font-size:11px;opacity:0.85;">🟢 Expert Farm Assistant</div>
+                    </div>
+                </div>
+                <button onclick="toggleChat()"
+                    style="background:rgba(255,255,255,0.2);border:none;color:white;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;">✕</button>
+            </div>
+            <div id="ai-chat-messages">
+                <div class="chat-msg bot">👋 Hello! I'm your AgroBrain AI assistant. Ask me anything about farming —
+                    crops, soil, weather, pests, market prices, or any agricultural queries!</div>
+            </div>
+            <div id="ai-chat-input-area">
+                <textarea id="ai-chat-input" rows="1" placeholder="Ask about crops, soil, pests..."
+                    onkeydown="handleChatKey(event)"></textarea>
+                <button id="ai-send-btn" onclick="sendChatMessage()">➤</button>
+            </div>
+        </div>
+        <div style="position:relative;display:inline-block;">
+            <button id="ai-chat-toggle" onclick="toggleChat()" title="AI Farm Assistant">🌿</button>
+            <div class="chat-badge"></div>
+        </div>
+    </div>
+
+    <script>
+        const chatBox = document.getElementById('ai-chat-box');
+        const chatMessages = document.getElementById('ai-chat-messages');
+        const chatInput = document.getElementById('ai-chat-input');
+        const sendBtn = document.getElementById('ai-send-btn');
+
+        function toggleChat() {
+            chatBox.classList.toggle('open');
+            if (chatBox.classList.contains('open')) chatInput.focus();
+        }
+
+        function handleChatKey(e) {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChatMessage(); }
+        }
+
+        function appendMessage(text, role) {
+            const div = document.createElement('div');
+            div.className = `chat-msg ${role}`;
+            // Render markdown-like bold + newlines
+            div.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            return div;
+        }
+
+        async function sendChatMessage() {
+            const msg = chatInput.value.trim();
+            if (!msg) return;
+            chatInput.value = '';
+            sendBtn.disabled = true;
+            appendMessage(msg, 'user');
+            const typingDiv = appendMessage('⏳ Thinking...', 'typing');
+            try {
+                const resp = await fetch('/ai-chat/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': document.cookie.match(/csrftoken=([^;]+)/)?.[1] || '' },
+                    body: JSON.stringify({ message: msg })
+                });
+                const data = await resp.json();
+                typingDiv.remove();
+                appendMessage(data.reply || 'Sorry, I could not get a response.', 'bot');
+            } catch (err) {
+                typingDiv.remove();
+                appendMessage('Connection failed. Please check your internet connection.', 'bot');
+            }
+            sendBtn.disabled = false;
+            chatInput.focus();
+        }
+    </script>
+    {% endif %}
+
+    <!-- Scroll-to-top button -->
+    <button id="scroll-top-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})"
+        style="display:none;position:fixed;bottom:90px;right:{% if user.is_authenticated %}90px{% else %}24px{% endif %};z-index:9998;width:44px;height:44px;background:linear-gradient(135deg,#059669,#0d9488);color:white;border:none;border-radius:50%;cursor:pointer;box-shadow:0 4px 12px rgba(5,150,105,.3);font-size:20px;align-items:center;justify-content:center;transition:opacity .3s;">
+        ↑
+    </button>
+    <script>
+        const scrollBtn = document.getElementById('scroll-top-btn');
+        window.addEventListener('scroll', () => {
+            scrollBtn.style.display = window.scrollY > 300 ? 'flex' : 'none';
+        });
+    </script>
+
 </body>
+
 </html>

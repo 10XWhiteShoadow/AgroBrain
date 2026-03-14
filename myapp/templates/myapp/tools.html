@@ -1,40 +1,122 @@
 {% extends 'myapp/base.html' %}
 
+{% block title %}Top Farm Equipment & Tools | AgroBrain{% endblock %}
+
 {% block content %}
-<div class="bg-emerald-50 min-h-screen px-4 sm:px-6 lg:px-8 py-8">
-    <div class="max-w-6xl mx-auto">
-        <div class="bg-white rounded-2xl shadow-sm p-6 mb-8 border border-emerald-100">
-            <h1 class="text-emerald-800 text-3xl font-bold text-center mb-8">Product Grid</h1>
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {% for product in products %}
-                <div class="bg-white p-4 rounded-lg shadow-md border border-emerald-100 relative">
-                    {% if product.badge %}
-                    <span class="absolute top-2 z-10 left-2 bg-yellow-400 text-black px-3 py-1 text-xs font-bold rounded">{{ product.badge }}</span>
-                    {% endif %}
-                    <a href="{{ product.link }}" target="_blank">
-                        <img src="{{ product.img_url }}" alt="{{ product.title }}" class="w-full h-48 object-cover rounded-md transition-transform transform hover:scale-105">
-                    </a>
-                    <div class="mt-4">
-                        <p class="text-emerald-600 text-sm">{{ product.collection }}</p>
-                        <h2 class="text-lg font-bold text-emerald-800">{{ product.title }}</h2>
-                        {% comment %} <div class="text-yellow-500">{{ product.rating }}</div> {% endcomment %}
-                        <div class="flex items-center">
-                            <svg class="w-4 h-4 text-yellow-300 me-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
-                                <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
-                            </svg>
-                            <p class="ms-2 text-sm font-bold text-gray-900">{{ product.rating }}</p>
-                            {% comment %} <span class="w-1 h-1 mx-1.5 bg-gray-500 rounded-full dark:bg-gray-400"></span> {% endcomment %}
-                            {% comment %} <a href="#" class="text-sm font-medium text-gray-900 underline hover:no-underline dark:text-white">73 reviews</a> {% endcomment %}
+<div class="bg-emerald-50/50 dark-theme:bg-emerald-950 min-h-screen py-8 pb-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        <!-- Header Section -->
+        <div class="text-center mb-12 animate-on-load">
+            <h1
+                class="text-3xl md:text-4xl font-extrabold text-emerald-900 dark-theme:text-emerald-100 mb-4 tracking-tight">
+                Farm Equipment & Tools
+            </h1>
+            <p class="text-emerald-700 dark-theme:text-emerald-300 max-w-2xl mx-auto text-lg">
+                Top-rated agricultural tools, machinery, and equipment available on Amazon to make your farming
+                operations more efficient.
+            </p>
+        </div>
+
+        {% if not tool_categories %}
+        <!-- Empty State -->
+        <div
+            class="bg-white dark-theme:bg-emerald-800 rounded-2xl shadow-sm border border-emerald-100 dark-theme:border-emerald-700 p-12 text-center animate-on-load">
+            <div
+                class="w-20 h-20 bg-emerald-100 dark-theme:bg-emerald-900/50 rounded-full flex items-center justify-center mx-auto mb-6">
+                <span class="text-4xl">🔧</span>
+            </div>
+            <h3 class="text-xl font-bold text-emerald-900 dark-theme:text-white mb-2">No tools found</h3>
+            <p class="text-emerald-600 dark-theme:text-emerald-400">Please check back later for new tool listings.</p>
+        </div>
+        {% else %}
+
+        <!-- Categories and Products -->
+        <div class="space-y-16">
+            {% for category in tool_categories %}
+            <div class="animate-on-load">
+                <div class="flex items-center mb-8 border-b-2 border-emerald-200 dark-theme:border-emerald-800 pb-3">
+                    <span
+                        class="text-3xl mr-3 bg-emerald-100 dark-theme:bg-emerald-900/50 w-12 h-12 flex items-center justify-center rounded-xl shadow-sm">{{
+                        category.icon }}</span>
+                    <h2 class="text-2xl font-bold text-emerald-900 dark-theme:text-emerald-100">{{ category.name }}</h2>
+                    <span
+                        class="ml-4 bg-emerald-600 text-white py-1 px-3 rounded-full text-xs font-semibold shadow-sm">{{
+                        category.items|length }} items</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                    {% for item in category.items %}
+                    <!-- Product Card -->
+                    <div
+                        class="group bg-white dark-theme:bg-emerald-800 rounded-2xl shadow-sm hover:shadow-xl border border-emerald-100 dark-theme:border-emerald-700 overflow-hidden flex flex-col transition-all duration-300 transform hover:-translate-y-2">
+                        <!-- Image Container with Affiliate Overlay -->
+                        <div class="relative h-56 bg-white overflow-hidden flex items-center justify-center p-4">
+                            <span
+                                class="absolute top-3 left-3 bg-[#ff9900] text-black text-[10px] font-bold px-2.5 py-1 rounded-[4px] uppercase tracking-wider z-10 shadow-md flex items-center gap-1">
+                                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
+                                    <path
+                                        d="M13.67,11.51c-1.35,0-2.31,0.56-2.9,1.7l1.04,0.61c0.41-0.78,1.06-1.12,1.88-1.12c0.88,0,1.38,0.48,1.38,1.21v0.24 c-2.32,0.11-3.87,1.02-3.87,2.83c0,1.44,1.05,2.44,2.54,2.44c1.23,0,2.1-0.61,2.55-1.46v1.27h1.36v-4.48 C17.65,12.56,16.14,11.51,13.67,11.51z M14.12,18.23c-0.89,0-1.47-0.54-1.47-1.34c0-0.94,0.85-1.55,2.69-1.63v0.58 C15.34,17.2,14.93,18.23,14.12,18.23z" />
+                                    <path
+                                        d="M12,2C6.48,2,2,6.48,2,12s4.48,10,10,10s10-4.48,10-10S17.52,2,12,2z M12,20c-4.41,0-8-3.59-8-8s3.59-8,8-8s8,3.59,8,8 S16.41,20,12,20z" />
+                                </svg>
+                                Amazon
+                            </span>
+                            <img src="{{ item.img }}" alt="{{ item.title }}" referrerpolicy="no-referrer"
+                                class="h-full object-contain group-hover:scale-105 transition-transform duration-500">
+
+                            <div
+                                class="absolute inset-0 bg-gradient-to-t from-[#232f3e]/80 via-[#232f3e]/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center p-4">
+                                <a href="{{ item.link }}" target="_blank" rel="noopener noreferrer"
+                                    class="w-full bg-[#f0c14b] hover:bg-[#f4d076] text-[#111] text-sm font-bold py-2.5 px-4 rounded-md shadow-lg transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 flex items-center justify-center border border-[#a88734]">
+                                    Buy on Amazon
+                                    <svg class="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                                    </svg>
+                                </a>
+                            </div>
                         </div>
-                        <div class="mt-2 text-lg">
-                            <span class="text-gray-500 line-through">₹{{ product.old_price }}</span>
-                            <span class="text-red-500 font-bold">₹{{ product.new_price }}</span>
+
+                        <!-- Content -->
+                        <div class="p-5 flex flex-col flex-grow bg-emerald-50/40 dark-theme:bg-emerald-900/40">
+                            {% if item.brand %}
+                            <div
+                                class="text-xs font-bold text-emerald-600 dark-theme:text-emerald-400 uppercase tracking-wider mb-1.5">
+                                {{ item.brand }}
+                            </div>
+                            {% endif %}
+
+                            <h3 class="text-[15px] leading-snug font-bold text-gray-900 dark-theme:text-gray-100 flex-grow mb-4 line-clamp-2"
+                                title="{{ item.title }}">
+                                {{ item.title }}
+                            </h3>
+
+                            <div
+                                class="flex items-center justify-between mt-auto pt-4 border-t border-emerald-200/60 dark-theme:border-emerald-700/60">
+                                <div class="flex flex-col">
+                                    <span
+                                        class="text-[11px] text-gray-500 dark-theme:text-gray-400 uppercase font-semibold">Price</span>
+                                    <span class="text-xl font-black text-[#B12704] dark-theme:text-[#e47911]">{{
+                                        item.price }}</span>
+                                </div>
+                                <a href="{{ item.link }}" target="_blank"
+                                    class="w-9 h-9 rounded-full bg-white dark-theme:bg-gray-800 hover:bg-gray-100 flex items-center justify-center text-gray-700 dark-theme:text-gray-300 shadow border border-gray-200 dark-theme:border-gray-700 transition-colors">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                    </svg>
+                                </a>
+                            </div>
                         </div>
                     </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
             </div>
+            {% endfor %}
         </div>
+        {% endif %}
+
     </div>
 </div>
 {% endblock %}
